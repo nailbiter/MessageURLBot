@@ -42,17 +42,45 @@ from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import uuid
 from os import path
-
+import pymongo
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
 
+def _get_mongo_coll():
+    mongo_client = pymongo.MongoClient(host="mongodb://root:example@mongo")
+    mongo_coll = mongo_client["MessageURLBot"]["messages"]
+    return mongo_coll
+
+
+def start(update: Update, context: CallbackContext) -> None:
+    _, message_uuid = update.message.text.split(" ")
+    logger.warning(f"message_uuid: {message_uuid}")
+    mongo_coll = _get_mongo_coll()
+    r = mongo_coll.find_one({"message_uuid": message_uuid})
+    logger.warning(f"r: {r}")
+    update.message.chat.send_message(
+        "reply test", reply_to_message_id=r["message_id"])
+
+
 def echo(update: Update, context: CallbackContext) -> None:
-    logging.warning(update)
-    update.message.reply_text(f"`{uuid.uuid4()}`", parse_mode="Markdown")
+    logger.warning(update)
+    logger.warning(update.message.link)
+
+    message_uuid = str(uuid.uuid4()).replace("-", "")
+    update.message.reply_text(f"`{message_uuid}`", parse_mode="Markdown")
+
+    r = {"message_uuid": message_uuid, "message_id": update.message.message_id}
+    logger.warning(f"r: {r}")
+
+    mongo_coll = _get_mongo_coll()
+    mongo_coll.insert_one(r)
+
+#    update.message.forward(chat_id=340880765,from_chat_id=340880765,message_id=9)
+#    context.bot.forward_message(
+#        chat_id=340880765, from_chat_id=340880765, message_id=9)
 
 
 def main() -> None:
@@ -63,6 +91,7 @@ def main() -> None:
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
 
+    dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(MessageHandler(filters=Filters.all, callback=echo))
 
     # Start the Bot
@@ -76,6 +105,6 @@ def main() -> None:
 
 if __name__ == '__main__':
     if path.isfile(".env"):
-        logging.warning("loading .env")
+        logger.warning("loading .env")
         load_dotenv()
     main()
