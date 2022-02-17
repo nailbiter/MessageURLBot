@@ -71,7 +71,7 @@ def echo(update: Update, context: CallbackContext) -> None:
 
     message_uuid = str(uuid.uuid4()).replace("-", "")
 #    update.message.reply_text(f"`{message_uuid}`", parse_mode="Markdown")
-    https: // t.me/MessageURLBot?start = ac4db9c594a341738ff6b717456ddeb3
+    # https://t.me/MessageURLBot?start=ac4db9c594a341738ff6b717456ddeb3
     update.message.reply_text(
         f"https://t.me/MessageURLBot?start={message_uuid}", parse_mode="Markdown")
 
