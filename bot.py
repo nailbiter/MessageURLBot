@@ -70,17 +70,16 @@ def echo(update: Update, context: CallbackContext) -> None:
     logger.warning(update.message.link)
 
     message_uuid = str(uuid.uuid4()).replace("-", "")
-    update.message.reply_text(f"`{message_uuid}`", parse_mode="Markdown")
+#    update.message.reply_text(f"`{message_uuid}`", parse_mode="Markdown")
+    https: // t.me/MessageURLBot?start = ac4db9c594a341738ff6b717456ddeb3
+    update.message.reply_text(
+        f"https://t.me/MessageURLBot?start={message_uuid}", parse_mode="Markdown")
 
     r = {"message_uuid": message_uuid, "message_id": update.message.message_id}
     logger.warning(f"r: {r}")
 
     mongo_coll = _get_mongo_coll()
     mongo_coll.insert_one(r)
-
-#    update.message.forward(chat_id=340880765,from_chat_id=340880765,message_id=9)
-#    context.bot.forward_message(
-#        chat_id=340880765, from_chat_id=340880765, message_id=9)
 
 
 def main() -> None:
