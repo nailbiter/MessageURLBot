@@ -35,7 +35,6 @@ bot.
 
 
 # Enable logging
-
 import logging
 import os
 from dotenv import load_dotenv
@@ -43,6 +42,7 @@ from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import uuid
 from os import path
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
@@ -51,6 +51,7 @@ logger = logging.getLogger(__name__)
 
 
 def echo(update: Update, context: CallbackContext) -> None:
+    logging.warning(update)
     update.message.reply_text(f"`{uuid.uuid4()}`", parse_mode="Markdown")
 
 
